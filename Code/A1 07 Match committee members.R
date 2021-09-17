@@ -17,9 +17,10 @@ library(GGally)     # pairs plots
 #     Committees data compiled by Charles Stewart III and Jonathan Woon (MIT) 
 #     (http://web.mit.edu/17.251/www/data_page.html#2), 
 # (D) the OpenSecrets committee member names and identification codes,
-# (E) the OpenSecrets Individual Contributions data for relevant industries, and
-# (F) the district level employment rates in relevant sectors according to the
-#     North American Industry Classification System (NAICS)
+# (E) the OpenSecrets Individual Contributions data for relevant industries,
+# (F) the OpenSecrets Lobbying data for relevant industries, and
+# (G) the district/state level employment rates in relevant sectors according 
+#     to the North American Industry Classification System (NAICS)
 #-------------------------------------------------------------------------------
 setwd("~/Dropbox/Article_Analysis/")
 
@@ -350,8 +351,6 @@ CCCM <- unique(append(CTTs$Name, foundations$Name))
 relevant.industries <- c(fossil.fuel.industry, alternate.energy, 
                          environmental)#, republican.conservative)
 
-
-
 # ------------------------------------------------------------------------------
 # Center for Responsive Politics (CRP | OpenSecrets) Contributions Data
 # 
@@ -411,7 +410,6 @@ relevant.industries <- c(fossil.fuel.industry, alternate.energy,
 # 
 # Source: OpenSectrets UserGuide.pdf
 # ------------------------------------------------------------------------------
-
 
 # Define for which Congresses data will be loaded
 congresses <- c(108:111)
@@ -493,7 +491,7 @@ for (i in 1:length(congresses)) {
       indivs.temp %>% filter(Catcode %in% relevant.industries) %>%  
         group_by(CID, Catcode) %>% summarise(income = sum(Amount)),
       # Individual contributions by CCCM
-      indivs.temp %>% filter(! Catcode %in% fossil.fuel.industry) %>% 
+      indivs.temp %>% filter(! Catcode %in% relevant.industries) %>% 
         filter(tolower(Orgname) %in% tolower(CCCM) |
                tolower(Employer) %in% tolower(CCCM)) %>%  
         group_by(CID) %>% summarise(income = sum(Amount), Catcode = "CCCM"),
@@ -519,8 +517,6 @@ for (i in 1:length(congresses)) {
                             "alternate.energy"),
          Catcode = replace(Catcode, Catcode %in% environmental, 
                             "environmental")) %>% 
-         # Catcode = replace(Catcode, Catcode %in% republican.conservative, 
-         #                    "republican.conservative")) %>% 
   summarise(income = sum(income)) %>% 
   arrange(Catcode) %>% 
   pivot_wider(names_from = Catcode, names_prefix = "inc_",
@@ -535,7 +531,7 @@ beep()
 rm(dir, path, congresses, years, i, cmtes, indivs.temp, pacs.temp, pac_other.temp, income.temp)
 
 # Check income per catgory
-income[, 2:7] %>% colSums()
+income[, 2:6] %>% colSums() %>% as.data.frame()
       
 # Calculate income proportions
 income <- income %>% 
@@ -549,13 +545,13 @@ glimpse(income)
 committee_members <- left_join(committee_members, income,
                                by = c("CID", "congress"))
 # Drop individual income data frames
-# rm(income108, income109, income110, income111)
+rm(income108, income109, income110, income111)
 # Check the new data
 describe(committee_members[51:66], skew = F)
 # Save the data
 # write_csv(committee_members, 'Data/07_committees_members.csv')
 
-
+# Code to compare resulting income with OpenSecrets webpage 
 # income[income$CID == "N00000019",] # Clinton, Hillary
 # sum(income$inc_CCCM[income$CID == "N00000019"][1:3])
 # # 3000 >> correct
@@ -587,53 +583,119 @@ describe(committee_members[51:66], skew = F)
 # # Carson, Brad
 # income[income$CID == "N00009704",] # 0 >> correct
 
+#-------------------------------------------------------------------------------
+# (F) Match the OpenSecrets Lobbying data 
+#-------------------------------------------------------------------------------
+
+# Load the raw lobbying data (quarterly lobbying reports)
+lob_lobbying <- 
+  read.table("~/Data/Lobby/lob_lobbying.txt", sep = ",", quote = "|",
+  col.names = c("Uniqid", "Registrant_raw", "Registrant", "Isfirm",
+                "Client_raw", "Client", "Ultorg", "Amount", "Catcode", 
+                "Source", "Self", "IncludeNSFS", "Use", "Ind", "year", "Type", 
+                "Typelong", "Affiliate")) %>% 
+  filter(year %in% 2003:2010) %>% arrange(year, Catcode) %>%
+  filter(Use == "y" & Ind == "y") %>%
+  mutate(congress = case_when(
+           year %in% 2003:2004 ~ 108,
+           year %in% 2005:2006 ~ 109,
+           year %in% 2007:2008 ~ 110,
+           year %in% 2009:2010 ~ 111), 
+         halfyear = case_when(
+           Typelong %>% str_extract('\\w+-?\\w+') %in% 
+             c("FIRST", "SECOND", "MID-YEAR") ~ "H1",
+           Typelong %>% str_extract('\\w+-?\\w+') %in%  
+             c("THIRD", "FOURTH", "YEAR-END") ~ "H2"))
+
+# Aggregate the lobbying expenditures by 6-month-period for relevant industries
+lobbying <- rbind(
+  lob_lobbying %>% filter(Use == "y" & Ind == "y") %>% 
+    filter(Catcode %in% relevant.industries) %>%  
+    group_by(Catcode, halfyear, year, congress) %>%
+    summarise(income = sum(Amount)) %>% 
+    group_by(Catcode, halfyear, year, congress) %>%
+    mutate(Catcode = replace(Catcode, Catcode %in% fossil.fuel.industry, 
+                            "fossil.fuel.industry"),
+           Catcode = replace(Catcode, Catcode %in% alternate.energy, 
+                            "alternate.energy"),
+           Catcode = replace(Catcode, Catcode %in% environmental, 
+                            "environmental")) %>% 
+    summarise(income = sum(income)),
+  lob_lobbying %>%  filter(Use == "y" & Ind == "y") %>% 
+    filter(! Catcode %in% relevant.industries) %>% 
+    filter(tolower(Client) %in% tolower(CCCM) | 
+           tolower(Client_raw) %in% tolower(CCCM) |
+           tolower(Ultorg) %in% tolower(CCCM)) %>%  
+    group_by(halfyear, year, congress) %>%
+    summarise(income = sum(Amount), Catcode = "CCCM") %>% 
+    select(Catcode, halfyear, year, congress, income))
+
+
+# Match the lobbying expenditures with the committee member data
+committee_members$halfyear <- ifelse(format(committee_members$date,"%m") <= 6,
+                                     "H1", "H2")
+committee_members <- left_join(committee_members, 
+                               lobbying %>% pivot_wider(names_from = "Catcode", 
+                                                        names_prefix = "lobbying.",
+                                                        values_from = "income"),
+                               by = c("halfyear", "year", "congress"))
+
+
+# committee_members %>% group_by(year) %>% summarise(income = sum(lobbying.fossil.fuel.industry)) %>% 
+#   ggplot(aes(year, income)) + geom_point()
 
 #-------------------------------------------------------------------------------
-# Match House district information
+# (G) Match the district/state level employment rates in relevant sectors  
+#     according to the North American Industry Classification System (NAICS)
 #-------------------------------------------------------------------------------
+
+
+# Match House district information
 
 # Load district data
-districts <- read.csv("~/Data/QCEW/QCEW_congressional_districts_employment.csv")[,2:16] %>%
+districts <- 
+  read.csv("~/Data/QCEW/QCEW_congressional_districts_employment.csv")[,2:16] %>%
   mutate(emp_fossil.fuel = select(., emp.211:emp.221112) %>% rowSums()) %>% 
   group_by(state, stab, congress, cd_code, congressionaldistrict) %>% 
   summarise(emp_total = sum(emp.10),
             emp_fossil.fuel = sum(emp_fossil.fuel)) %>% 
   mutate(per_emp_fossil.fuel = emp_fossil.fuel/emp_total*100)
-# Replace single congressional district states cd_code with 1 instead of 0 to match committee data
+# Replace specific codes to match the district data codes to the committee data
+# Replace single congressional district states cd_code with 1 instead of 0 
 districts$cd_code[districts$stab %in% c("MT", "ND", "SD", "VT", "WY")] <- 1
-# Replace non-voting member states' cd_code with 79 (Delegate) to match committee data
+# Replace non-voting member states' cd_code with 79 (Delegate)
 districts$cd_code[districts$stab %in% c("DC", "VI")] <- 79
-# Replace non-voting member states' cd_code with 80 (Resident Commissioner) committee data
+# Replace non-voting member states' cd_code with 80 (Resident Commissioner)
 districts$cd_code[districts$stab %in% c("PR")] <- 80
-
 # Subset House data
 house_members_districts <- subset(committee_members, chamber == "House") %>% 
   mutate(state.icpsr = as.numeric(state.icpsr),
          cd_code = as.numeric(cd_code))
-# Replace non-voting member states' cd_code with 79 (Delegate) where wrongly coded as 1
+# Replace non-voting member states' cd_code with 79 (Delegate) where falsely 
+# coded as 1
 house_members_districts$cd_code[house_members_districts$stab %in% c("VI")] <- 79
 # Changes congressional district information due to redistricting
-house_members_districts$cd_code[281] <- 14 # Steve LaTourette: Redistricted to the 14th district. https://en.wikipedia.org/wiki/Steve_LaTourette
-
+house_members_districts$cd_code[281] <- 14 
+# Steve LaTourette: Redistricted to the 14th district. 
+# See: https://en.wikipedia.org/wiki/Steve_LaTourette
 # Join House and district data
 house_members_districts <- left_join(house_members_districts, districts,
           by = c('congress' = 'congress',
                  'stab' = 'stab',
                  'cd_code' = 'cd_code')) %>%
   rename(area_title = congressionaldistrict)
-
 # Check data
 describe(house_members_districts, skew = F)
 # Missing employment data (39 observations):
-house_members_districts$stab[is.na(house_members_districts$emp_total)] %>% unique() %>% sort()
-# All are delegates from US territories (American Samoa, Guam, the Northern Mariana Islands) and
-# non-voting members of the United States House of Representatives
+house_members_districts$stab[is.na(house_members_districts$emp_total)] %>% 
+  unique() %>% sort()
+# All are delegates from US territories (American Samoa, Guam, the Northern 
+# Mariana Islands) and non-voting members of the United States House of 
+# Representatives
 districts[districts$stab %in% c("AS","GU","MP"),] 
 # >> No employment information available for these territories. Leave as NA.
 
-#-------------------------------------------------------------------------------
 # Match Senate state information
-#-------------------------------------------------------------------------------
 
 # Load stata data
 states <- read.csv("~/Data/QCEW/QCEW_states_employment.csv")[,2:15]  %>% 
@@ -642,43 +704,34 @@ states <- read.csv("~/Data/QCEW/QCEW_states_employment.csv")[,2:15]  %>%
   summarise(emp_total = sum(emp.10),
             emp_fossil.fuel = sum(emp_fossil.fuel)) %>% 
   mutate(per_emp_fossil.fuel = emp_fossil.fuel/emp_total*100)
-
 # Join state 2-digit state abbreviations (stab)
-state.icpsrs <- read.table("Data/StewartWoon/ICPSR_state_codes.txt", sep = ",", header = T) %>% 
+state.icpsrs <- read.table("Data/StewartWoon/ICPSR_state_codes.txt", sep = ",", 
+                           header = T) %>% 
   mutate(state.name = str_trim(tolower(state.name)))
-states$stab <- str_trim(state.icpsrs$state.abb[match(tolower(states$area_title), state.icpsrs$state.name)])
+states$stab <- str_trim(state.icpsrs$state.abb[match(tolower(states$area_title), 
+                                                     state.icpsrs$state.name)])
 states$stab[states$area_title == "Puerto Rico"] <- "PR"
 states$stab[states$area_title == "Virgin Islands"] <- "VI"
 rm(state.icpsrs)
-
 # Join state data
 senate_members_states <- subset(committee_members, chamber == "Senate") %>% 
   mutate(state.icpsr = as.numeric(state.icpsr))
 senate_members_states <- left_join(senate_members_states, states,
           by = c('congress' = 'congress',
                  'stab' = 'stab'))
-
 # Check data
 describe(senate_members_states, skew = F)
 
-# write_csv(senate_members_states,
-#           'Data/07_senate_members_states_relevant.csv')
-
-
-#-------------------------------------------------------------------------------
 # Recombine data
-#-------------------------------------------------------------------------------
-
-committee_members_matched <- rbind(house_members_districts, senate_members_states)
-
+committee_members_matched <- rbind(house_members_districts, 
+                                   senate_members_states)
 # Select relevant committee members (exclude all MoCs that joined the committe 
 # after the hearing was held)
 committee_members_matched <- committee_members_matched %>% 
   filter(not_member_yet == 0)
-
+# Check final data
 describe(committee_members_matched, skew = F)
 
+# Save data
 write_csv(committee_members_matched, 
-          "Data/climatehearings0310_for_modelling_20210709.csv")
-
-table(committee_members$year, committee_members$majority)
+          "Data/07_climatehearings0310_for_modelling_20210819.csv")
