@@ -17,7 +17,7 @@ setwd("~/Dropbox/Article_Analysis/")
 #-------------------------------------------------------------------------------
 # (A) Load ....
 
-committee_members_matched <- read.csv("Data/climatehearings0310_for_modelling_20210709.csv")
+committee_members_matched <- read.csv("Data/07_climatehearings0310_for_modelling_20210920.csv")
 
 # Select relevant committee members (exclude all MoCs that joined the committe 
 # after the hearing was held)
