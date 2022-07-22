@@ -10,6 +10,7 @@ annual.by_industry
 # Files
 *.pkl
 *.ods
+*.pyc
 
 # History files
 .Rhistory
