@@ -1,9 +1,15 @@
 # Folders
 /Backup
 /Hearings
+/Plots
+/BulkData
+geocorr2000
+PoliticalGeography
+annual.by_industry
 
 # Files
 *.pkl
+*.ods
 
 # History files
 .Rhistory
@@ -25,5 +31,6 @@
 /*.Rcheck/
 
 # RStudio files
+.Rproj
 .Rproj.user/
 
