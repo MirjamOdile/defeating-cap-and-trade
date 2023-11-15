@@ -56,7 +56,7 @@ second_axis = function(y1, y2) {
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 CRP_Codes <- read.delim("OpenSecrets/BulkData/CRP_Categories.txt",
-                        header = TRUE, skip = 8, sep = "\t")
+                        header = TRUE, skip = 7, sep = "\t")
 
 # List of industries (Catorder) in a sector (Sector)
 CRP_Codes %>% select(Sector, Catorder, Industry, Catcode, Catname) %>% 

@@ -14,7 +14,7 @@ library(ggpubr)     # arranging plots
 # C: the committee assignments at the time based on the congressional 
 #     Committees data compiled by Charles Stewart III and Jonathan Woon (MIT) 
 #     (http://web.mit.edu/17.251/www/data_page.html#2), 
-# D: the congress-legislators data (to obtain the OpenSectrets identification 
+# D: the congress-legislators data (to obtain the OpenSecrets identification 
 #     codes),
 # E: the OpenSecrets Individual Contributions data for relevant industries, and
 # F: the OpenSecrets Lobbying data for relevant industries.
@@ -214,6 +214,9 @@ senate_assignments <-
          date_of_termination = as.Date(date_of_termination)) %>%
   filter(congress %in% c(108, 109, 110, 111)) # subset correct timespan
 
+# -------------------------------------------------------------------------
+
+
 
 # Join the MoCs that were on the committees of the hearings
 
@@ -368,7 +371,7 @@ rm(legislators)
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 CRP_Codes <- read.delim("OpenSecrets/BulkData/CRP_Categories.txt",
-                        header = TRUE, skip = 8, sep = "\t")
+                        header = TRUE, skip = 7, sep = "\t")
 
 # List of industries (Catorder) in a sector (Sector)
 CRP_Codes %>% select(Sector, Catorder, Industry, Catcode, Catname) %>% 
