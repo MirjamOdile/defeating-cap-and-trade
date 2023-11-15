@@ -389,7 +389,7 @@ summary(contrarian <- glm(
   cbind(n_contrarian, n_witnesses-n_contrarian) ~
     sum_cc_fossilfuel + # Unweighted
     # sum_cc_fossilfuel_w + # Weighted
-    lobbying_fossilfuel  +
+    lobbying_fossilfuel +
     committee_type +
     majority,
   family = binomial(link = "logit"),
@@ -517,7 +517,7 @@ summary(contrarianH <- glm(
   cbind(n_contrarian, n_witnesses-n_contrarian) ~
     sum_cc_fossilfuel + # Unweighted
     # sum_cc_fossilfuel_w + # Weighted
-    lobbying_fossilfuel  +
+    lobbying_fossilfuel +
     committee_type +
     majority,
   family = binomial(link = "logit"),

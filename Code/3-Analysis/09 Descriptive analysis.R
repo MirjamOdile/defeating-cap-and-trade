@@ -289,15 +289,15 @@ hearings_per_quarter <-
 
 p1 <- ggplot() +
   geom_bar(data = hearings_per_quarter,
-           aes(yearquarter, N, fill = "Quarterly count"),
+           aes(yearquarter, N, fill = " "),
            stat = "identity",  alpha = .9) +
-  scale_fill_manual(name = "Climate hearings",
-                    values = c("Quarterly count" = "darkgray")) +
+  scale_fill_manual(name = "        Climate hearings per quarter",
+                    values = c(" " = "darkgray")) +
   geom_line(data = legislation_per_year,linetype = 2,
-            aes(date, count, color = "Yearly count"), 
+            aes(date, count, color = " "), 
             lwd = .4) +
-  scale_color_manual(name = "Proposed cap & trade bills",
-                     values = c("Yearly count" = "black")) +
+  scale_color_manual(name = "Proposed cap & trade bills per year",
+                     values = c(" " = "black")) +
   labs(x = "Time", y = "N", fill = " ", title = " ") +
   scale_x_date(date_breaks = '1 year', date_labels = "%Y",
                limits = as.Date(c("2003-01-01", "2011-01-01"))) +
@@ -307,8 +307,8 @@ p1 <- ggplot() +
         panel.grid.minor = element_blank(),
         legend.position="bottom"); p1
 
-# ggsave("../Plots/timeline_new.png", p1,
-#        device = "png", dpi = 200, width = 190, height = 115, units = "mm")
+# ggsave("../Plots/timeline_hearings_legislation.png", p1,
+#        device = "png", dpi = 200, width = 190, height = 85, units = "mm")
 
 
 ## Mosaic Plot: Witnesses by category and time ---------------------------------
@@ -425,9 +425,9 @@ p3_prop <-
         panel.grid.minor = element_blank()); p3_prop
 
 # ggsave("../Plots/denialists_vs_scientists.png", p3_prop,
-#        device = "png", dpi = 200, width = 160, height = 60, units = "mm")
+#        device = "png", dpi = 200, width = 160, height = 50, units = "mm")
 
-## Other plots -----------------------------------------------------------------
+ ## Other plots -----------------------------------------------------------------
 
 # Monthly witnesses by category
 df_category %>% 
@@ -502,3 +502,4 @@ p2_lineplot <- df_category %>%
         axis.title.y = element_text(margin = margin(l = 0, r = 3)),
         panel.grid.minor = element_blank())+
   guides(colour = guide_legend(nrow = 2)); p2_lineplot
+
