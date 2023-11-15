@@ -8,7 +8,7 @@ This repository makes available the code to replicate the analysis of climate ch
 
 ## Data
 
-The data used in this analysis is partially available in the `\Data` folder, specifically all data generated or compiled by the authors. In order to replicate the analysis, this data needs to be complemented with other publicly available datasets. Specifically, the following datasets need to be added:
+The data used in this analysis is partially available in the `/Data` folder, specifically all data generated or compiled by the authors. In order to replicate the analysis, this data needs to be complemented with other publicly available datasets. Specifically, the following datasets need to be added:
 
 * Committee assignment data based on the congressional Committees data compiled by Charles Stewart III and Jonathan Woon (MIT) saved into a folder called `Data/StewartWoon`.  <br>
     Available [here](http://web.mit.edu/17.251/www/data_page.html#2). Required files:
@@ -26,4 +26,10 @@ The data used in this analysis is partially available in the `\Data` folder, spe
   * Campaign Finance Data: the folders `CampaignFin04`,  `CampaignFin06`,  `CampaignFin08`, and  `CampaignFin10` listed as 2004, 2006, 2006, and 2010 Cycle Tables
   * Lobbying Data: the folder `Lobby` listed as Lobbying Tables
  
+ ## Analysis
+
+ Once all data is added to the `/Data` folder, the descriptive and inferential analysis can be replicated in `R` by executing the files in the folder `Code/3-Analysis` in numeric order. <br> <br>
  
+ The folders `Code/1-DataExtraction` and `Code/2-CommitteeHearings` are not required for the analysis, but rather serve as a reference for the generation of the data at the core of this analysis. <br> <br>
+
+:bangbang: The code was written using Unix-based filepath notation with forward slashes. This needs to be changed to backslashes if executed in Windows.
