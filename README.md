@@ -26,10 +26,12 @@ The data used in this analysis is partially available in the `/Data` folder, spe
   * Campaign Finance Data: the folders `CampaignFin04`,  `CampaignFin06`,  `CampaignFin08`, and  `CampaignFin10` listed as 2004, 2006, 2006, and 2010 Cycle Tables
   * Lobbying Data: the folder `Lobby` listed as Lobbying Tables
  
- ## Analysis
+## Analysis
 
- Once all data is added to the `/Data` folder, the descriptive and inferential analysis can be replicated in `R` by executing the files in the folder `Code/3-Analysis` in numeric order. <br> <br>
- 
- The folders `Code/1-DataExtraction` and `Code/2-CommitteeHearings` are not required for the analysis, but rather serve as a reference for the generation of the data at the core of this analysis. <br> <br>
+Once all data is added to the `/Data` folder, the descriptive and inferential analysis can be replicated in `R` by executing the files in the folder `Code/3-Analysis` in numeric order. <br> <br>
 
-:bangbang: The code was written using Unix-based filepath notation with forward slashes. This needs to be changed to backslashes if executed in Windows.
+:heavy_exclamation_mark: The working directory needs to be changed to the `/Data` parent folder at the top of each script by replacing the existing filepath in the `setwd()` function.<br>
+:bangbang: The code was written using Unix-based filepath notation with forward slashes. This needs to be changed to backslashes if executed in Windows. <br><br>
+
+The code in the folders `Code/1-DataExtraction` and `Code/2-CommitteeHearings` is not required for replicating the analysis, but rather serves as a reference for the generation of the data at the core of this analysis. <br> <br>
+
