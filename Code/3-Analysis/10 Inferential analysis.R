@@ -781,16 +781,17 @@ results_table(results_appendix_Senate)
 results_export(results_appendix_Senate)
 
 
-# 6: Effect plots --------------------------------------------------------------
+# 6: Effects -------------------------------------------------------------------
 
 library(ggeffects)
 
-## Contrarians by lobbying-----------------------------------------------------
+### Effect plots ---------------------------------------------------------------
+
+#### Contrarians by lobbying----------------------------------------------------
 
 hearings %$% describeBy(sum_cc_fossilfuel, majority)
 hearings %$% describeBy(lobbying_fossilfuel, majority)
 
-### Effect plots ---------------------------------------------------------------
 
 eff_R <- ggpredict(contrarian, terms = 
                     c("sum_cc_fossilfuel [0.84:4.96 by=.1]",
@@ -850,56 +851,10 @@ model_effects <- ggarrange(
 ggsave("../Plots/model_effects_CC_L.png", model_effects,
        device = "png", dpi = 200, width = 190, height = 120, units = "mm")
 
-### Effect sizes ---------------------------------------------------------------
-
-eff <- rbind(eff_R, eff_D) %>% 
-  group_by(group, facet, panel) %>% 
-  skim(predicted) %>% as.data.frame() %>% 
-  select(facet, group, panel, numeric.p0, numeric.mean, numeric.p100) %>% 
-  mutate(group = case_when(
-    group %in% c(69.21, 93.51) ~ "Min",
-    group %in% c(82.16, 140.26) ~ "Mean",
-    TRUE ~ "Max"),
-    numeric.p0 = numeric.p0*100, 
-    numeric.mean = numeric.mean*100,
-    numeric.p100 = numeric.p100*100) %>% 
-  rename(Majority = facet,
-         FFIlobbying = group, 
-         CommitteeType = panel,
-         Min = numeric.p0, 
-         Mean = numeric.mean,
-         Max = numeric.p100) %>% 
-pivot_longer(c(Min, Mean, Max), 
-             names_to = "FFIcampaigncontributions",
-             values_to = "Contrarians"); eff
-
-## Effect of campaign contributions
-eff %>%
-  pivot_wider(names_from = FFIcampaigncontributions, values_from = Contrarians) %>% 
-  mutate(diff = Max - Min) #%>% summary() # 1%-7%
-
-## Effect of lobbying expenditures
-eff %>%
-  pivot_wider(names_from = FFIlobbying, values_from = Contrarians) %>% 
-  mutate(diff = Max - Min) #%>% summary() # 3%-14%
-
-## Effect of committee type
-eff %>%
-  pivot_wider(names_from = CommitteeType, values_from = Contrarians) %>% 
-  mutate(diff = `Key committee` - `Other committee`) #%>% summary() #3%-14%
-
-## Effect of majority
-eff %>%
-  pivot_wider(names_from = Majority, values_from = Contrarians) %>% 
-  mutate(diff = R - D) #%>% summary() # 5%-15%
-
-
-## Contrarians by campaign contributions ---------------------------------------
+#### Contrarians by campaign contributions -------------------------------------
 
 hearings %$% describeBy(lobbying_fossilfuel, majority)
 hearings %$% describeBy(sum_cc_fossilfuel, majority)
-
-### Effect plots ---------------------------------------------------------------
 
 eff_R <- ggpredict(contrarian, terms = 
                     c("lobbying_fossilfuel [69.21:101.94 by=.1]",
@@ -961,48 +916,51 @@ model_effects <- ggarrange(
 ggsave("../Plots/model_effects.png", model_effects,
        device = "png", dpi = 200, width = 190, height = 120, units = "mm")
 
-### Effect sizes ---------------------------------------------------------------
+## Effect sizes (marginal means) -----------------------------------------------
 
-eff <- rbind(eff_R, eff_D) %>% 
-  group_by(group, facet, panel) %>% 
-  skim(predicted) %>% as.data.frame() %>% 
-  select(facet, group, panel, numeric.p0, numeric.mean, numeric.p100) %>% 
-  mutate(group = case_when(
-    group %in% c(0.75, 0.84) ~ "Min",
-    group %in% c(2.96, 2.1) ~ "Mean",
-    TRUE ~ "Max"),
-    numeric.p0 = numeric.p0*100, 
-    numeric.mean = numeric.mean*100,
-    numeric.p100 = numeric.p100*100) %>% 
-  rename(Majority = facet,
-         FFIcampaigncontributions= group, 
-         CommitteeType = panel,
-         Min = numeric.p0, 
-         Mean = numeric.mean,
-         Max = numeric.p100) %>% 
-  pivot_longer(c(Min, Mean, Max), 
-               names_to = "FFIlobbying",
-               values_to = "Contrarians"); eff
+## Effect of campaign contributions ---
+hearings$sum_cc_fossilfuel %>% summary()
 
-## Effect of campaign contributions
-eff %>%
-  pivot_wider(names_from = FFIcampaigncontributions, values_from = Contrarians) %>% 
-  mutate(diff = Max - Min) #%>% summary() # 1%-7%
+eff_sum_cc_fossilfuel <- ggemmeans(contrarian, terms = 
+                                     c("sum_cc_fossilfuel [0.75, 6.54]")) 
 
-## Effect of lobbying expenditures
-eff %>%
-  pivot_wider(names_from = FFIlobbying, values_from = Contrarians) %>% 
-  mutate(diff = Max - Min) #%>% summary() # 3%-14%
+eff_sum_cc_fossilfuel
 
-## Effect of committee type
-eff %>%
-  pivot_wider(names_from = CommitteeType, values_from = Contrarians) %>% 
-  mutate(diff = `Key committee` - `Other committee`) #%>% summary() #3%-14%
+eff_sum_cc_fossilfuel %>% 
+  as.data.frame() %>% 
+  summarise(effectsize = (predicted[2] - predicted[1])*100)
 
-## Effect of majority
-eff %>%
-  pivot_wider(names_from = Majority, values_from = Contrarians) %>% 
-  mutate(diff = R - D) #%>% summary() # 5%-15%
+
+## Effect of lobbying expenditures ---
+hearings$lobbying_fossilfuel %>% summary()
+
+eff_lobbying_fossilfuel <- ggemmeans(contrarian, terms = 
+                                       c("lobbying_fossilfuel [69.2, 201.9]")) 
+
+eff_lobbying_fossilfuel
+
+eff_lobbying_fossilfuel %>% 
+  as.data.frame() %>% 
+  summarise(effectsize = (predicted[2] - predicted[1])*100)
+
+
+## Effect of committee type ---
+eff_committee_type <- ggemmeans(contrarian, terms = c("committee_type"))
+eff_committee_type
+
+eff_committee_type %>% 
+  as.data.frame() %>% 
+  summarise(effectsize = (predicted[2] - predicted[1])*100)
+
+
+## Effect of committee type ---
+eff_majority <- ggemmeans(contrarian, terms = c("majority"))
+eff_majority
+
+eff_majority %>% 
+  as.data.frame() %>% 
+  summarise(effectsize = (predicted[1] - predicted[2])*100)
+
 
 # 7: Model validation: Generalized Estimating Equations (GEE) ------------------
 
@@ -1237,3 +1195,4 @@ results_gee_S_appendix <- rbind(
                       "chamberSenate" = "Chamber: Senate"))
 
 results_gee_S_appendix
+
