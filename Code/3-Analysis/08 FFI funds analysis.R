@@ -341,8 +341,9 @@ p.lobbying_year <-
   scale_linetype_manual(name = " ",
                         values = c("solid", "dashed")) +
   scale_x_continuous(breaks = seq(2003,2010,1)) +
-  scale_y_continuous(limits = c(135,366),
+  scale_y_continuous(limits = c(144,371),
                      breaks = seq(150,350,50),
+                     expand = c(.01, 0),
                      sec.axis = 
                        dup_axis(breaks = lobbying_year_rescaled$breaks, 
                                 labels = lobbying_year_rescaled$labels,
@@ -372,6 +373,7 @@ p.cc_year <-
   scale_x_continuous(breaks = seq(2003,2010,1)) +
   scale_y_continuous(limits = c(9,17),
                      breaks = c(9,11,13,15,17),
+                     expand = c(.03, 0),
     sec.axis = 
       dup_axis(breaks = cc_year_rescaled$breaks, 
                labels = cc_year_rescaled$labels,
@@ -388,11 +390,11 @@ p.cc_year <-
         axis.title.y.right = element_text(margin = margin(l = 6))) +
   guides(fill = guide_legend(nrow = 1))
 
-plot <- ggarrange(p.lobbying_year, p.cc_year, heights = c(1,1),
+plot <- ggarrange(p.lobbying_year, NULL,  p.cc_year, heights = c(1,0.15, 1),
                   ncol = 1, common.legend = TRUE); plot
 
-# ggsave("../Plots/timeline_FFImoney.png", plot,
-#        device = "png", dpi = 200, width = 190, height = 120, units = "mm")
+ggsave("../Plots/timeline_FFImoney.pdf", plot,
+       device = "pdf", dpi = 1000, width = 90, height = 120, units = "mm")
 
 p.cc_congress <-
   cc_congress %>% select(c(1,3,4)) %>% 
@@ -424,9 +426,6 @@ p.cc_congress <-
 
 plot_congress <- ggarrange(p.lobbying_year, p.cc_congress, heights = c(1.2,1),
                   ncol = 1, common.legend = TRUE); plot_congress
-
-# ggsave("../Plots/timeline_FFImoney2.png", plot_congress,
-#        device = "png", dpi = 200, width = 190, height = 120, units = "mm")
 
 # 4: FFI campaign contributions by MoC type  -----------------------------------
 # Compare mean FFI campaign contributions to MoCs on committees holding a 

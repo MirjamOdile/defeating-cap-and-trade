@@ -334,8 +334,6 @@ campaigncontributions <- hearings %>%
   scale_x_continuous(labels = scales::number_format(accuracy = 1)) +
   theme_bw(); campaigncontributions
 
-ggsave("../Plots/campaigncontributions.png", campaigncontributions,
-       device = "png", dpi = 200, width = 190, height = 60, units = "mm")
 
 # Denialist witnesses as proportion of all scientific testimonies
 hearings %>% 
@@ -848,8 +846,6 @@ model_effects <- ggarrange(
     guides(color=guide_legend(title.position="top", title.hjust = 0.5))
   ); model_effects
 
-ggsave("../Plots/model_effects_CC_L.png", model_effects,
-       device = "png", dpi = 200, width = 190, height = 120, units = "mm")
 
 #### Contrarians by campaign contributions -------------------------------------
 
@@ -913,8 +909,8 @@ model_effects <- ggarrange(
   common.legend = T, legend = "bottom"
 ); model_effects
 
-ggsave("../Plots/model_effects.png", model_effects,
-       device = "png", dpi = 200, width = 190, height = 120, units = "mm")
+ggsave("../Plots/model_effects.pdf", model_effects,
+       device = "pdf", dpi = 1000, width = 190, height = 120, units = "mm")
 
 ## Effect sizes (marginal means) -----------------------------------------------
 

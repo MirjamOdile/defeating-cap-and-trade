@@ -307,8 +307,8 @@ p1 <- ggplot() +
         panel.grid.minor = element_blank(),
         legend.position="bottom"); p1
 
-# ggsave("../Plots/timeline_hearings_legislation.png", p1,
-#        device = "png", dpi = 200, width = 190, height = 85, units = "mm")
+ggsave("../Plots/timeline_hearings_legislation.pdf", p1,
+       device = "pdf", dpi = 1000, width = 140, height = 85, units = "mm")
 
 
 ## Mosaic Plot: Witnesses by category and time ---------------------------------
@@ -338,10 +338,12 @@ p2 <- df_category %>%
   theme_mosaic() +
   scale_y_continuous(breaks = scales::breaks_pretty(10),
                      labels = scales::percent_format(accuracy = 5L)) +
-  theme(axis.title.x = element_text(margin = margin(t = 10, b = -10))); p2
+  theme(axis.title.x = element_text(margin = margin(t = 10, b = -10)),
+        plot.margin = margin(0, 0, 10, 0)); p2
 
-# ggsave("../Plots/witnesses_mosaic_congress.png", p2,
-#        device = "png", dpi = 200, width = 190, height = 140, units = "mm")
+ggsave("../Plots/witnesses_mosaic_congress.pdf", p2,
+       device = "pdf", dpi = 1000, width = 190, height = 130, units = "mm")
+
 
 ## Denialists vs scientists ----------------------------------------------------
 
@@ -354,7 +356,7 @@ denialists_vs_contrarians <-
           filter(category %in% c("Denialist", "Scientist")) %>%
           mutate(category = factor(category,
                                    levels = c("Denialist", "Scientist")),
-                 type = 'All hearings') %>%
+                 type = "     All hearings") %>%
           group_by(congress, category, type) %>%
           summarise(count = sum(N)),
         df_contrarian %>%
@@ -362,13 +364,15 @@ denialists_vs_contrarians <-
                    committee_type == 'Key committee') %>% 
           mutate(category = factor(category,
                                    levels = c("Denialist", "Scientist")),
-                 type = "Hearings in key committees") %>%
+                 type = "          Hearings in key committees") %>%
           group_by(congress, category, type) %>%
           summarise(count = sum(N))) %>% 
   ungroup() %>% 
   group_by(congress, type) %>% 
   mutate(prop = count/sum(count)) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(type = factor(type, levels = c("     All hearings",
+                                        "          Hearings in key committees")))
   
 p3_count <-
   ggplot(aes(congress, count, fill = category, label = count),
@@ -396,6 +400,7 @@ p3_count <-
         panel.grid.minor = element_blank()); p3_count
 
 p3_prop <-
+  
   ggplot(aes(congress, prop, color = category, fill = category, label = count),
          data = denialists_vs_contrarians) +
   geom_col(position = 'dodge', alpha = 1) +
@@ -418,14 +423,14 @@ p3_prop <-
         legend.title = element_text(face = "bold"),
         legend.position="right",
         legend.box="vertical",
-        legend.margin=margin(t = 2),
+        legend.margin=margin(t = 2, r = 2),
         axis.title.x = element_text(margin = margin(t = 3)),
         axis.text.x = element_text(margin = margin(t = -5)),
         axis.title.y = element_text(margin = margin(l = 0, r = 3)),
         panel.grid.minor = element_blank()); p3_prop
 
-# ggsave("../Plots/denialists_vs_scientists.png", p3_prop,
-#        device = "png", dpi = 200, width = 160, height = 50, units = "mm")
+ggsave("../Plots/denialists_vs_scientists.pdf", p3_prop,
+       device = "pdf", dpi = 1000, width = 140, height = 50, units = "mm")
 
  ## Other plots -----------------------------------------------------------------
 
