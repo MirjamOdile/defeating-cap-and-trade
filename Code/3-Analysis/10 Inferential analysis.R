@@ -88,7 +88,8 @@ results_export <- function(results_object) {
 }
 
 # 1: Load data -----------------------------------------------------------------
-setwd("/Users/mn/Library/CloudStorage/OneDrive-UniversityofExeter/Projects/GitHub/defeating-cap-and-trade/Data")
+
+setwd("../../Data")
 getwd()
 
 hearings_committee_member_level <- 
@@ -909,8 +910,8 @@ model_effects <- ggarrange(
   common.legend = T, legend = "bottom"
 ); model_effects
 
-ggsave("../Plots/model_effects.pdf", model_effects,
-       device = "pdf", dpi = 1000, width = 190, height = 120, units = "mm")
+# ggsave("../Plots/model_effects.pdf", model_effects,
+#        device = "pdf", dpi = 1000, width = 190, height = 120, units = "mm")
 
 ## Effect sizes (marginal means) -----------------------------------------------
 

@@ -15,7 +15,7 @@ options(pillar.sigfig = 7) # tibble decimal places
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 getwd()
-setwd("/Users/mn/Library/CloudStorage/OneDrive-UniversityofExeter/Projects/GitHub/defeating-cap-and-trade/Data")
+setwd("../../Data")
 theme_set(theme_minimal())
 
 # Functions---------------------------------------------------------------------

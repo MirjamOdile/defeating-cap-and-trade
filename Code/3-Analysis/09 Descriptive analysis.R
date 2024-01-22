@@ -14,7 +14,7 @@ library(Hmisc)
 # Single column 90 mm
 
 getwd()
-setwd("/Users/mn/Library/CloudStorage/OneDrive-UniversityofExeter/Projects/GitHub/defeating-cap-and-trade/Data")
+setwd("../../Data")
 theme_set(theme_minimal())
 
 # Functions --------------------------------------------------------------------
@@ -307,8 +307,8 @@ p1 <- ggplot() +
         panel.grid.minor = element_blank(),
         legend.position="bottom"); p1
 
-ggsave("../Plots/timeline_hearings_legislation.pdf", p1,
-       device = "pdf", dpi = 1000, width = 140, height = 85, units = "mm")
+# ggsave("../Plots/timeline_hearings_legislation.pdf", p1,
+#        device = "pdf", dpi = 1000, width = 140, height = 85, units = "mm")
 
 
 ## Mosaic Plot: Witnesses by category and time ---------------------------------
@@ -341,8 +341,8 @@ p2 <- df_category %>%
   theme(axis.title.x = element_text(margin = margin(t = 10, b = -10)),
         plot.margin = margin(0, 0, 10, 0)); p2
 
-ggsave("../Plots/witnesses_mosaic_congress.pdf", p2,
-       device = "pdf", dpi = 1000, width = 190, height = 130, units = "mm")
+# ggsave("../Plots/witnesses_mosaic_congress.pdf", p2,
+#        device = "pdf", dpi = 1000, width = 190, height = 130, units = "mm")
 
 
 ## Denialists vs scientists ----------------------------------------------------
@@ -429,10 +429,10 @@ p3_prop <-
         axis.title.y = element_text(margin = margin(l = 0, r = 3)),
         panel.grid.minor = element_blank()); p3_prop
 
-ggsave("../Plots/denialists_vs_scientists.pdf", p3_prop,
-       device = "pdf", dpi = 1000, width = 140, height = 50, units = "mm")
+# ggsave("../Plots/denialists_vs_scientists.pdf", p3_prop,
+#        device = "pdf", dpi = 1000, width = 140, height = 50, units = "mm")
 
- ## Other plots -----------------------------------------------------------------
+# 5: Other plots (not included in final article) -------------------------------
 
 # Monthly witnesses by category
 df_category %>% 
