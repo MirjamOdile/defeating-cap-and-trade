@@ -345,6 +345,11 @@ hearings %>%
 hearings %>% 
   mutate(SciDen = n_science + n_denialist,
          per_denialist = n_denialist/SciDen*100) %$% 
+  t.test(per_denialist, mu = 18, alternative = "greater")
+
+hearings %>% 
+  mutate(SciDen = n_science + n_denialist,
+         per_denialist = n_denialist/SciDen*100) %$% 
   t.test(per_denialist, mu = 3, alternative = "greater")
 
 # Contrarian witnesses as proportion of all scientific and contrarian witnesses 
@@ -353,6 +358,13 @@ hearings %>%
   mutate(SciDen = n_science + n_denialist,
          per_denialist = n_denialist/SciDen*100) %$% 
   describeBy(per_denialist, committee_type)
+
+hearings %>% 
+  filter(committee_type == "Key committee") %>% 
+  mutate(SciDen = n_science + n_denialist,
+         per_denialist = n_denialist/SciDen*100) %>% 
+  select(n_science, n_denialist, n_contrarian, SciDen, per_denialist) %$% 
+  t.test(per_denialist, mu = 18, alternative = "greater")
 
 hearings %>% 
   filter(committee_type == "Key committee") %>% 
